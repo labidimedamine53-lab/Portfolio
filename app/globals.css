@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #030712;
+  --foreground: #f8fbff;
+  --cyan-glow: rgba(34, 211, 238, 0.36);
+  --violet-glow: rgba(139, 92, 246, 0.28);
 }
 
 @theme inline {
@@ -12,15 +14,156 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6rem;
+  background: var(--background);
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.08), transparent 26rem),
+    radial-gradient(circle at 80% 0%, rgba(139, 92, 246, 0.08), transparent 28rem),
+    var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.32);
+  color: #ffffff;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.star-field {
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.95) 0 1px, transparent 1.3px),
+    radial-gradient(circle, rgba(125, 211, 252, 0.75) 0 1px, transparent 1.2px),
+    radial-gradient(circle, rgba(196, 181, 253, 0.75) 0 1px, transparent 1.4px);
+  background-position:
+    0 0,
+    42px 76px,
+    108px 28px;
+  background-size:
+    160px 160px,
+    220px 220px,
+    280px 280px;
+  animation: star-drift 28s linear infinite;
+}
+
+.space-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+.nebula-drift {
+  animation: nebula-float 13s ease-in-out infinite;
+}
+
+.nebula-drift-delayed {
+  animation: nebula-float 15s ease-in-out infinite reverse;
+}
+
+.comet {
+  position: absolute;
+  height: 1px;
+  width: 10rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.9), transparent);
+  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8));
+  opacity: 0;
+}
+
+.comet-one {
+  left: -12rem;
+  top: 18%;
+  transform: rotate(-16deg);
+  animation: comet-pass 11s ease-in-out infinite;
+}
+
+.comet-two {
+  right: -14rem;
+  top: 62%;
+  transform: rotate(-18deg);
+  animation: comet-pass-reverse 14s ease-in-out infinite 4s;
+}
+
+@keyframes star-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-160px, 160px, 0);
+  }
+}
+
+@keyframes nebula-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(24px, -18px, 0) scale(1.08);
+  }
+}
+
+@keyframes comet-pass {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-16deg);
+  }
+  26% {
+    opacity: 1;
+  }
+  40%,
+  100% {
+    opacity: 0;
+    transform: translate3d(120vw, 18vh, 0) rotate(-16deg);
+  }
+}
+
+@keyframes comet-pass-reverse {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-18deg);
+  }
+  30% {
+    opacity: 1;
+  }
+  46%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-120vw, -14vh, 0) rotate(-18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
 }

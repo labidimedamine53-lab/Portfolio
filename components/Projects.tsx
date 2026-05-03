@@ -49,7 +49,7 @@ export default function Projects() {
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
                   className="object-cover transition duration-700 group-hover:scale-105"
-                  placeholder="blur"
+                  unoptimized
                 />
                 <div className={`absolute inset-0 bg-gradient-to-br ${project.accent} opacity-25 mix-blend-screen`} />
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.06),rgba(2,6,23,0.72)),radial-gradient(circle_at_18%_12%,rgba(34,211,238,0.26),transparent_34%),radial-gradient(circle_at_82%_8%,rgba(167,139,250,0.24),transparent_32%)]" />

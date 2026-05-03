@@ -29,7 +29,7 @@ export default function Navbar() {
           <span className="text-base font-semibold text-white">Amine.dev</span>
         </a>
 
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           {content.navLinks.map((link) => (
             <a
               key={link.href}
@@ -41,7 +41,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           <button
             type="button"
             aria-label={content.language.ariaLabel}
@@ -83,7 +83,7 @@ export default function Navbar() {
           type="button"
           aria-label="Toggle menu"
           aria-expanded={isOpen}
-          className="grid h-11 w-11 place-items-center rounded-lg border border-white/10 bg-white/5 text-white transition hover:bg-white/10 md:hidden"
+          className="grid h-11 w-11 place-items-center rounded-lg border border-white/10 bg-white/5 text-white transition hover:bg-white/10 lg:hidden"
           onClick={() => setIsOpen((value) => !value)}
         >
           {isOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
@@ -93,7 +93,7 @@ export default function Navbar() {
       <AnimatePresence>
         {isOpen ? (
           <motion.div
-            className="border-t border-white/10 bg-[#030712]/95 px-5 py-5 backdrop-blur-2xl md:hidden"
+            className="border-t border-white/10 bg-[#030712]/95 px-5 py-5 backdrop-blur-2xl lg:hidden"
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}

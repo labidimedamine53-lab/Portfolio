@@ -1,10 +1,39 @@
-import type { StaticImageData } from "next/image";
-import mtkImage from "@/assets/MTK.png";
-import nikeImage from "@/assets/Nike.png";
-import predictionImage from "@/assets/Prediction.png";
-import tecnocopertureImage from "@/assets/Tecno Coperture.png";
-
 export type Locale = "en" | "it";
+
+const projectImages = {
+  mtk: "/projects/mtk.png",
+  nike: "/projects/nike.png",
+  prediction: "/projects/prediction.png",
+  tecnocoperture: "/projects/tecnocoperture.png",
+} as const;
+
+const certificationFiles = {
+  aws: {
+    href: "/certifications/aws.pdf",
+    filename: "aws-certificate.pdf",
+    preview: "/certifications/aws.jpg",
+  },
+  google: {
+    href: "/certifications/google.pdf",
+    filename: "google-certificate.pdf",
+    preview: "/certifications/google.jpg",
+  },
+  ielts: {
+    href: "/certifications/ielts.pdf",
+    filename: "ielts-certificate.pdf",
+    preview: "/certifications/ielts.png",
+  },
+  laurea: {
+    href: "/certifications/laurea-triannale.pdf",
+    filename: "laurea-triannale.pdf",
+    preview: "/certifications/laurea-triannale.jpg",
+  },
+  tcf: {
+    href: "/certifications/tcf.pdf",
+    filename: "tcf-certificate.pdf",
+    preview: "/certifications/tcf.png",
+  },
+} as const;
 
 type NavLink = {
   label: string;
@@ -21,9 +50,19 @@ type Project = {
   description: string;
   tech: string[];
   accent: string;
-  image: StaticImageData;
+  image: string;
   imageAlt: string;
   liveUrl?: string;
+};
+
+type Certification = {
+  title: string;
+  issuer: string;
+  description: string;
+  href?: string;
+  filename?: string;
+  preview?: string;
+  imageAlt?: string;
 };
 
 type TimelineItem = {
@@ -86,6 +125,15 @@ type SiteContent = {
     details: string;
     items: Project[];
   };
+  certifications: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    download: string;
+    pending: string;
+    pdf: string;
+    items: Certification[];
+  };
   experience: {
     eyebrow: string;
     title: string;
@@ -134,6 +182,7 @@ export const translations: Record<Locale, SiteContent> = {
       { label: "About", href: "#about" },
       { label: "Skills", href: "#skills" },
       { label: "Projects", href: "#projects" },
+      { label: "Certifications", href: "#certifications" },
       { label: "Contact", href: "#contact" },
     ],
     language: {
@@ -229,7 +278,7 @@ export const translations: Record<Locale, SiteContent> = {
             "Company website for roofing, renovation, asbestos removal, and energy-efficiency services with a clean service-first structure.",
           tech: ["Web Design", "Frontend", "Responsive UI"],
           accent: "from-cyan-400 via-blue-500 to-violet-500",
-          image: tecnocopertureImage,
+          image: projectImages.tecnocoperture,
           imageAlt: "Tecnocoperture website project screenshot",
           liveUrl: "https://tecnocoperture.netlify.app/",
         },
@@ -239,7 +288,7 @@ export const translations: Record<Locale, SiteContent> = {
             "Showcase website built with vanilla PHP, MySQL, and phpMyAdmin for dynamic content and database-backed pages.",
           tech: ["PHP", "MySQL", "phpMyAdmin"],
           accent: "from-fuchsia-400 via-violet-500 to-cyan-400",
-          image: mtkImage,
+          image: projectImages.mtk,
           imageAlt: "MTK website project screenshot",
           liveUrl: "http://mtk.tn/",
         },
@@ -249,7 +298,7 @@ export const translations: Record<Locale, SiteContent> = {
             "Frontend e-commerce clone focused on premium layout, product presentation, responsive grids, and polished UI details.",
           tech: ["HTML", "CSS", "JavaScript"],
           accent: "from-sky-400 via-cyan-300 to-emerald-300",
-          image: nikeImage,
+          image: projectImages.nike,
           imageAlt: "Nike clone frontend project screenshot",
           liveUrl: "https://nike-clone-chi-five.vercel.app/",
         },
@@ -259,8 +308,69 @@ export const translations: Record<Locale, SiteContent> = {
             "AI-based tool concept for estimating project timelines from scope, complexity, team capacity, and historical patterns.",
           tech: ["AI", "Machine Learning", "Python"],
           accent: "from-violet-400 via-blue-400 to-cyan-300",
-          image: predictionImage,
+          image: projectImages.prediction,
           imageAlt: "Project duration estimator app screenshot",
+        },
+      ],
+    },
+    certifications: {
+      eyebrow: "Certifications",
+      title: "Certifications in one place.",
+      description:
+        "A compact set of academic and technical credentials, with available certificates offered as direct PDF downloads.",
+      download: "Download Certificate",
+      pending: "Available Soon",
+      pdf: "PDF",
+      items: [
+        {
+          title: "Bachelor Degree Certificate",
+          issuer: "University credential",
+          description:
+            "Academic certification connected to my computer technologies and information systems development foundation.",
+          href: certificationFiles.laurea.href,
+          filename: certificationFiles.laurea.filename,
+          preview: certificationFiles.laurea.preview,
+          imageAlt: "Bachelor degree certificate preview",
+        },
+        {
+          title: "AWS Certificate",
+          issuer: "Amazon Web Services",
+          description:
+            "Cloud-focused certification connected to infrastructure, scalable systems, and modern development workflows.",
+          href: certificationFiles.aws.href,
+          filename: certificationFiles.aws.filename,
+          preview: certificationFiles.aws.preview,
+          imageAlt: "AWS certificate preview",
+        },
+        {
+          title: "Google Certificate",
+          issuer: "Google",
+          description:
+            "Google training certification connected to digital tools, technical foundations, and applied technology skills.",
+          href: certificationFiles.google.href,
+          filename: certificationFiles.google.filename,
+          preview: certificationFiles.google.preview,
+          imageAlt: "Google certificate preview",
+        },
+        {
+          title: "IELTS Certificate",
+          issuer: "IELTS",
+          description:
+            "English language certification for academic and professional communication.",
+          href: certificationFiles.ielts.href,
+          filename: certificationFiles.ielts.filename,
+          preview: certificationFiles.ielts.preview,
+          imageAlt: "IELTS certificate preview",
+        },
+        {
+          title: "TCF Certificate",
+          issuer: "France Education International",
+          description:
+            "French language certification validating communication skills for study, work, and international mobility.",
+          href: certificationFiles.tcf.href,
+          filename: certificationFiles.tcf.filename,
+          preview: certificationFiles.tcf.preview,
+          imageAlt: "TCF certificate preview",
         },
       ],
     },
@@ -315,6 +425,7 @@ export const translations: Record<Locale, SiteContent> = {
       { label: "Chi sono", href: "#about" },
       { label: "Competenze", href: "#skills" },
       { label: "Progetti", href: "#projects" },
+      { label: "Certificazioni", href: "#certifications" },
       { label: "Contatti", href: "#contact" },
     ],
     language: {
@@ -410,7 +521,7 @@ export const translations: Record<Locale, SiteContent> = {
             "Sito aziendale per coperture, ristrutturazioni, rimozione amianto e servizi di efficienza energetica.",
           tech: ["Web Design", "Frontend", "UI Responsive"],
           accent: "from-cyan-400 via-blue-500 to-violet-500",
-          image: tecnocopertureImage,
+          image: projectImages.tecnocoperture,
           imageAlt: "Screenshot del progetto Tecnocoperture",
           liveUrl: "https://tecnocoperture.netlify.app/",
         },
@@ -420,7 +531,7 @@ export const translations: Record<Locale, SiteContent> = {
             "Sito vetrina sviluppato con PHP vanilla, MySQL e phpMyAdmin per contenuti dinamici e pagine collegate al database.",
           tech: ["PHP", "MySQL", "phpMyAdmin"],
           accent: "from-fuchsia-400 via-violet-500 to-cyan-400",
-          image: mtkImage,
+          image: projectImages.mtk,
           imageAlt: "Screenshot del progetto MTK Website",
           liveUrl: "http://mtk.tn/",
         },
@@ -430,7 +541,7 @@ export const translations: Record<Locale, SiteContent> = {
             "Clone frontend e-commerce focalizzato su layout premium, presentazione prodotto, griglie responsive e dettagli UI curati.",
           tech: ["HTML", "CSS", "JavaScript"],
           accent: "from-sky-400 via-cyan-300 to-emerald-300",
-          image: nikeImage,
+          image: projectImages.nike,
           imageAlt: "Screenshot del progetto Nike Clone",
           liveUrl: "https://nike-clone-chi-five.vercel.app/",
         },
@@ -440,8 +551,69 @@ export const translations: Record<Locale, SiteContent> = {
             "Concept di strumento AI per stimare le tempistiche di progetto da scope, complessità, capacità del team e pattern storici.",
           tech: ["AI", "Machine Learning", "Python"],
           accent: "from-violet-400 via-blue-400 to-cyan-300",
-          image: predictionImage,
+          image: projectImages.prediction,
           imageAlt: "Screenshot dell'app Project Duration Estimator",
+        },
+      ],
+    },
+    certifications: {
+      eyebrow: "Certificazioni",
+      title: "Certificazioni in un unico spazio.",
+      description:
+        "Una selezione compatta di credenziali accademiche e tecniche, con certificati disponibili come PDF diretti.",
+      download: "Scarica Certificato",
+      pending: "Disponibile Presto",
+      pdf: "PDF",
+      items: [
+        {
+          title: "Certificato Laurea Triennale",
+          issuer: "Credenziale universitaria",
+          description:
+            "Certificazione accademica collegata alla mia base in tecnologie informatiche e sviluppo sistemi informativi.",
+          href: certificationFiles.laurea.href,
+          filename: certificationFiles.laurea.filename,
+          preview: certificationFiles.laurea.preview,
+          imageAlt: "Anteprima del certificato di laurea triennale",
+        },
+        {
+          title: "Certificato AWS",
+          issuer: "Amazon Web Services",
+          description:
+            "Certificazione orientata al cloud, collegata a infrastrutture, sistemi scalabili e workflow di sviluppo moderni.",
+          href: certificationFiles.aws.href,
+          filename: certificationFiles.aws.filename,
+          preview: certificationFiles.aws.preview,
+          imageAlt: "Anteprima del certificato AWS",
+        },
+        {
+          title: "Certificato Google",
+          issuer: "Google",
+          description:
+            "Certificazione Google collegata a strumenti digitali, basi tecniche e competenze tecnologiche applicate.",
+          href: certificationFiles.google.href,
+          filename: certificationFiles.google.filename,
+          preview: certificationFiles.google.preview,
+          imageAlt: "Anteprima del certificato Google",
+        },
+        {
+          title: "Certificato IELTS",
+          issuer: "IELTS",
+          description:
+            "Certificazione linguistica di inglese per comunicazione accademica e professionale.",
+          href: certificationFiles.ielts.href,
+          filename: certificationFiles.ielts.filename,
+          preview: certificationFiles.ielts.preview,
+          imageAlt: "Anteprima del certificato IELTS",
+        },
+        {
+          title: "Certificato TCF",
+          issuer: "France Education International",
+          description:
+            "Certificazione linguistica di francese per studio, lavoro e mobilita internazionale.",
+          href: certificationFiles.tcf.href,
+          filename: certificationFiles.tcf.filename,
+          preview: certificationFiles.tcf.preview,
+          imageAlt: "Anteprima del certificato TCF",
         },
       ],
     },

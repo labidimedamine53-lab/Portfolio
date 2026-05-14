@@ -105,6 +105,13 @@ type SiteContent = {
     tags: string[];
     highlights: AboutHighlight[];
   };
+  journey: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    originLabel: string;
+    destinationLabel: string;
+  };
   skills: {
     eyebrow: string;
     title: string;
@@ -175,9 +182,9 @@ export const translations: Record<Locale, SiteContent> = {
   en: {
     navLinks: [
       { label: "About", href: "#about" },
+      { label: "Journey", href: "#journey" },
       { label: "Skills", href: "#skills" },
       { label: "Projects", href: "#projects" },
-      { label: "Certifications", href: "#certifications" },
       { label: "Contact", href: "#contact" },
     ],
     language: {
@@ -235,6 +242,14 @@ export const translations: Record<Locale, SiteContent> = {
           body: "Electronic engineering studies focused on AI, IoT systems, embedded thinking, and data-driven automation.",
         },
       ],
+    },
+    journey: {
+      eyebrow: "Journey",
+      title: "From Tunisia to Italy — one path, two homes.",
+      description:
+        "I grew up in Tunisia and now build modern web and AI work in Italy. The bridge between the two shapes how I think about technology — practical, multi-cultural, and built to travel.",
+      originLabel: "Origin",
+      destinationLabel: "Now based in",
     },
     skills: {
       eyebrow: "Skills",
@@ -408,9 +423,9 @@ export const translations: Record<Locale, SiteContent> = {
   it: {
     navLinks: [
       { label: "Chi sono", href: "#about" },
+      { label: "Percorso", href: "#journey" },
       { label: "Competenze", href: "#skills" },
       { label: "Progetti", href: "#projects" },
-      { label: "Certificazioni", href: "#certifications" },
       { label: "Contatti", href: "#contact" },
     ],
     language: {
@@ -468,6 +483,14 @@ export const translations: Record<Locale, SiteContent> = {
           body: "Percorso in ingegneria elettronica con focus su AI, sistemi IoT, logica embedded e automazione basata sui dati.",
         },
       ],
+    },
+    journey: {
+      eyebrow: "Percorso",
+      title: "Dalla Tunisia all'Italia — un cammino, due case.",
+      description:
+        "Sono cresciuto in Tunisia e oggi costruisco progetti web e AI in Italia. Il ponte tra i due mondi definisce il mio modo di pensare la tecnologia — pratico, multiculturale e fatto per viaggiare.",
+      originLabel: "Origine",
+      destinationLabel: "Attualmente in",
     },
     skills: {
       eyebrow: "Competenze",

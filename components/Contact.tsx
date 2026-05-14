@@ -1,8 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef } from "react";
+import { useFormStatus } from "react-dom";
 import { motion } from "framer-motion";
-import { Download, GitBranch, Mail, Network, Send } from "lucide-react";
+import { Download, GitBranch, Loader2, Mail, Network, Send } from "lucide-react";
+import { submitContact, type ContactState } from "@/app/actions/contact";
 import { cvDownload, socials } from "@/lib/content";
 import { useLocale } from "./LocaleProvider";
 import SectionHeading from "./SectionHeading";
@@ -15,16 +17,45 @@ const socialIcons = {
   Email: Mail,
 };
 
-export default function Contact() {
-  const [status, setStatus] = useState("");
-  const { content } = useLocale();
-  const contact = content.contact;
+const initialState: ContactState = { ok: false, message: "" };
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setStatus(contact.status);
-    event.currentTarget.reset();
-  }
+function SubmitButton({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <motion.button
+      type="submit"
+      disabled={pending}
+      className="group relative mt-7 inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-zinc-50 px-7 py-3.5 text-sm font-semibold text-black transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+      whileHover={pending ? undefined : { y: -2 }}
+      whileTap={pending ? undefined : { scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 380, damping: 24 }}
+    >
+      <span className="relative z-10 flex items-center gap-3">
+        {pending ? (
+          <Loader2 size={16} aria-hidden="true" className="animate-spin" />
+        ) : (
+          <Send size={16} aria-hidden="true" />
+        )}
+        {label}
+      </span>
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[#e6c98b]/70 to-transparent transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-full"
+      />
+    </motion.button>
+  );
+}
+
+export default function Contact() {
+  const { content, locale } = useLocale();
+  const contact = content.contact;
+  const formRef = useRef<HTMLFormElement>(null);
+  const loadedAt = useMemo(() => Date.now(), []);
+  const [state, formAction] = useActionState(submitContact, initialState);
+
+  useEffect(() => {
+    if (state.ok) formRef.current?.reset();
+  }, [state.ok, state.message]);
 
   return (
     <section id="contact" className="px-5 py-28 sm:px-8 lg:px-10">
@@ -50,7 +81,7 @@ export default function Contact() {
             </h3>
             <p className="relative mt-4 text-base leading-8 text-zinc-400">{contact.cardBody}</p>
             <div className="relative mt-8 grid gap-2.5">
-              {socials.map((social, idx) => {
+              {socials.map((social) => {
                 const Icon = socialIcons[social.label as keyof typeof socialIcons];
 
                 return (
@@ -63,10 +94,6 @@ export default function Contact() {
                     whileHover={{ x: 4 }}
                     whileTap={{ scale: 0.99 }}
                     transition={{ type: "spring", stiffness: 380, damping: 24 }}
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    style={{ transitionDelay: `${idx * 60}ms` }}
                   >
                     <span className="flex items-center gap-3">
                       {Icon ? (
@@ -104,13 +131,25 @@ export default function Contact() {
           </motion.div>
 
           <motion.form
-            onSubmit={handleSubmit}
+            ref={formRef}
+            action={formAction}
             className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-white/[0.01] p-8 backdrop-blur-2xl"
             initial={{ opacity: 0, x: 24, filter: "blur(8px)" }}
             whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             viewport={{ once: true, margin: "-90px" }}
             transition={{ duration: 0.95, ease: EASE }}
           >
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="loadedAt" value={loadedAt} />
+            {/* Honeypot — hidden from real users, attractive to bots */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute h-px w-px -translate-x-full opacity-0"
+            />
             <div className="absolute right-0 top-0 h-px w-28 bg-gradient-to-l from-[#e6c98b]/60 to-transparent" />
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
@@ -120,8 +159,14 @@ export default function Contact() {
                   name="name"
                   type="text"
                   placeholder={contact.namePlaceholder}
-                  className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-white outline-none transition-all placeholder:text-zinc-600 focus:border-[#e6c98b]/45 focus:bg-black/50"
+                  aria-invalid={state.errors?.name ? "true" : undefined}
+                  className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-white outline-none transition-all placeholder:text-zinc-600 focus:border-[#e6c98b]/45 focus:bg-black/50 aria-[invalid=true]:border-red-400/60"
                 />
+                {state.errors?.name ? (
+                  <span className="text-[0.7rem] font-medium normal-case tracking-normal text-red-300">
+                    {state.errors.name}
+                  </span>
+                ) : null}
               </label>
               <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
                 {contact.emailLabel}
@@ -130,8 +175,14 @@ export default function Contact() {
                   name="email"
                   type="email"
                   placeholder={contact.emailPlaceholder}
-                  className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-white outline-none transition-all placeholder:text-zinc-600 focus:border-[#e6c98b]/45 focus:bg-black/50"
+                  aria-invalid={state.errors?.email ? "true" : undefined}
+                  className="rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-white outline-none transition-all placeholder:text-zinc-600 focus:border-[#e6c98b]/45 focus:bg-black/50 aria-[invalid=true]:border-red-400/60"
                 />
+                {state.errors?.email ? (
+                  <span className="text-[0.7rem] font-medium normal-case tracking-normal text-red-300">
+                    {state.errors.email}
+                  </span>
+                ) : null}
               </label>
             </div>
             <label className="mt-5 grid gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
@@ -141,32 +192,24 @@ export default function Contact() {
                 name="message"
                 rows={6}
                 placeholder={contact.messagePlaceholder}
-                className="resize-none rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-white outline-none transition-all placeholder:text-zinc-600 focus:border-[#e6c98b]/45 focus:bg-black/50"
+                aria-invalid={state.errors?.message ? "true" : undefined}
+                className="resize-none rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm font-medium text-white outline-none transition-all placeholder:text-zinc-600 focus:border-[#e6c98b]/45 focus:bg-black/50 aria-[invalid=true]:border-red-400/60"
               />
+              {state.errors?.message ? (
+                <span className="text-[0.7rem] font-medium normal-case tracking-normal text-red-300">
+                  {state.errors.message}
+                </span>
+              ) : null}
             </label>
-            <motion.button
-              type="submit"
-              className="group relative mt-7 inline-flex w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-zinc-50 px-7 py-3.5 text-sm font-semibold text-black transition-colors hover:bg-white sm:w-auto"
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              transition={{ type: "spring", stiffness: 380, damping: 24 }}
-            >
-              <span className="relative z-10 flex items-center gap-3">
-                <Send size={16} aria-hidden="true" />
-                {contact.send}
-              </span>
-              <span
-                aria-hidden="true"
-                className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-[#e6c98b]/70 to-transparent transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-full"
-              />
-            </motion.button>
-            {status ? (
+            <SubmitButton label={contact.send} />
+            {state.message ? (
               <motion.p
-                className="mt-4 text-sm text-[#e6c98b]"
+                key={state.message}
+                className={`mt-4 text-sm ${state.ok ? "text-[#e6c98b]" : "text-red-300"}`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                {status}
+                {state.message}
               </motion.p>
             ) : null}
           </motion.form>

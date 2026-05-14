@@ -4,8 +4,10 @@ import Contact from "@/components/Contact";
 import Experience from "@/components/Experience";
 import Footer from "@/components/Footer";
 import Hero from "@/components/Hero";
+import JourneySection from "@/components/JourneySection";
 import { LocaleProvider } from "@/components/LocaleProvider";
 import Navbar from "@/components/Navbar";
+import PageViewTracker from "@/components/PageViewTracker";
 import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import SpaceBackground from "@/components/SpaceBackground";
@@ -15,11 +17,13 @@ export default function Home() {
     <>
       <SpaceBackground />
       <div className="grain-overlay" aria-hidden="true" />
+      <PageViewTracker />
       <LocaleProvider>
         <Navbar />
         <main className="relative z-10">
           <Hero />
           <About />
+          <JourneySection />
           <Skills />
           <Projects />
           <Certifications />

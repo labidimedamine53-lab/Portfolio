@@ -1,5 +1,5 @@
 import { desc, sql } from "drizzle-orm";
-import { db, schema } from "./index";
+import { db, ensureDatabase, schema } from "./index";
 
 export type DailyPoint = { date: string; views: number };
 export type HourPoint = { hour: string; views: number };
@@ -7,6 +7,8 @@ export type LabelCount = { label: string; count: number };
 export type LocaleCount = { name: string; value: number };
 
 export async function loadDashboardData() {
+  await ensureDatabase();
+
   const [
     messages,
     totalViews,
@@ -17,7 +19,6 @@ export async function loadDashboardData() {
     topPaths,
     topCountries,
     hourly,
-    daily,
     referrers,
     locales,
     latestEvents,
@@ -86,14 +87,6 @@ export async function loadDashboardData() {
       .from(schema.pageViews)
       .where(sql`${schema.pageViews.createdAt} >= datetime('now', '-7 days')`)
       .groupBy(sql`strftime('%H', ${schema.pageViews.createdAt})`),
-    db
-      .select({
-        date: sql<string>`date(${schema.pageViews.createdAt})`,
-        views: sql<number>`count(*)`,
-      })
-      .from(schema.pageViews)
-      .where(sql`${schema.pageViews.createdAt} >= datetime('now', '-7 days')`)
-      .groupBy(sql`date(${schema.pageViews.createdAt})`),
     db
       .select({
         label: schema.pageViews.referrer,

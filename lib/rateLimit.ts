@@ -1,5 +1,5 @@
 import { and, eq, lt, sql } from "drizzle-orm";
-import { db, schema } from "@/lib/db";
+import { db, ensureDatabase, schema } from "@/lib/db";
 
 export type RateLimitResult = {
   ok: boolean;
@@ -41,6 +41,7 @@ export async function checkRateLimit(
   const windowStart = Math.floor(nowSec / windowSec) * windowSec;
 
   try {
+    await ensureDatabase();
     await db
       .insert(schema.rateLimitBuckets)
       .values({ key, windowStart, count: 1 })

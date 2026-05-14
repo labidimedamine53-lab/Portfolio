@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useRef } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { motion } from "framer-motion";
 import { Download, GitBranch, Loader2, Mail, Network, Send } from "lucide-react";
@@ -50,11 +50,22 @@ export default function Contact() {
   const { content, locale } = useLocale();
   const contact = content.contact;
   const formRef = useRef<HTMLFormElement>(null);
-  const loadedAt = useMemo(() => Date.now(), []);
+  const loadedAtRef = useRef<HTMLInputElement>(null);
   const [state, formAction] = useActionState(submitContact, initialState);
 
   useEffect(() => {
-    if (state.ok) formRef.current?.reset();
+    if (loadedAtRef.current) {
+      loadedAtRef.current.value = String(Date.now());
+    }
+  }, []);
+
+  useEffect(() => {
+    if (state.ok) {
+      formRef.current?.reset();
+      if (loadedAtRef.current) {
+        loadedAtRef.current.value = String(Date.now());
+      }
+    }
   }, [state.ok, state.message]);
 
   return (
@@ -140,7 +151,7 @@ export default function Contact() {
             transition={{ duration: 0.95, ease: EASE }}
           >
             <input type="hidden" name="locale" value={locale} />
-            <input type="hidden" name="loadedAt" value={loadedAt} />
+            <input ref={loadedAtRef} type="hidden" name="loadedAt" />
             {/* Honeypot — hidden from real users, attractive to bots */}
             <input
               type="text"

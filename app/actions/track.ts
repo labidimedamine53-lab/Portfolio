@@ -2,7 +2,7 @@
 
 import crypto from "node:crypto";
 import { headers } from "next/headers";
-import { db, schema } from "@/lib/db";
+import { db, ensureDatabase, schema } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rateLimit";
 
 function hashSession(ip: string | null, userAgent: string | null) {
@@ -17,6 +17,8 @@ function hashSession(ip: string | null, userAgent: string | null) {
 
 export async function trackPageView(path: string, referrer?: string | null) {
   try {
+    await ensureDatabase();
+
     const h = await headers();
     const ip =
       h.get("x-forwarded-for")?.split(",")[0]?.trim() ??

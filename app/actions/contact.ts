@@ -3,7 +3,7 @@
 import crypto from "node:crypto";
 import { headers } from "next/headers";
 import { z } from "zod";
-import { db, schema } from "@/lib/db";
+import { db, ensureDatabase, schema } from "@/lib/db";
 import { checkRateLimits } from "@/lib/rateLimit";
 
 const schemaShape = z.object({
@@ -74,6 +74,16 @@ export async function submitContact(
     null;
   const userAgent = h.get("user-agent") ?? null;
   const ipHash = hashIp(ip);
+
+  try {
+    await ensureDatabase();
+  } catch (err) {
+    console.error("[submitContact] DB setup failed:", err);
+    return {
+      ok: false,
+      message: "Something went wrong. Please email me directly.",
+    };
+  }
 
   // Rate limit: 3 per hour, 10 per day, per IP
   const limit = await checkRateLimits(`contact:${ipHash}`, [

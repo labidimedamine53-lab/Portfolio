@@ -14,6 +14,7 @@ export default function Home() {
   return (
     <>
       <SpaceBackground />
+      <div className="grain-overlay" aria-hidden="true" />
       <LocaleProvider>
         <Navbar />
         <main className="relative z-10">

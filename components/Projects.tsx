@@ -6,12 +6,14 @@ import { ArrowUpRight, ExternalLink } from "lucide-react";
 import { useLocale } from "./LocaleProvider";
 import SectionHeading from "./SectionHeading";
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 export default function Projects() {
   const { content } = useLocale();
   const projects = content.projects;
 
   return (
-    <section id="projects" className="px-5 py-24 sm:px-8 lg:px-10">
+    <section id="projects" className="px-5 py-28 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           eyebrow={projects.eyebrow}
@@ -20,76 +22,89 @@ export default function Projects() {
         />
 
         <motion.div
-          className="mt-14 grid gap-6 md:grid-cols-2"
+          className="mt-16 grid gap-5 md:grid-cols-2"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-90px" }}
           variants={{
             hidden: {},
-            visible: { transition: { staggerChildren: 0.12 } },
+            visible: { transition: { staggerChildren: 0.14 } },
           }}
         >
           {projects.items.map((project, index) => (
             <motion.article
               key={project.title}
-              className="group overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur-2xl transition hover:-translate-y-1 hover:border-cyan-200/35 hover:bg-white/[0.075] hover:shadow-[0_0_54px_rgba(34,211,238,0.13)]"
+              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.025] backdrop-blur-2xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5 hover:border-white/20 hover:bg-white/[0.045]"
               variants={{
-                hidden: { opacity: 0, y: 28 },
+                hidden: { opacity: 0, y: 32, filter: "blur(8px)" },
                 visible: {
                   opacity: 1,
                   y: 0,
-                  transition: { duration: 0.58, ease: "easeOut" },
+                  filter: "blur(0px)",
+                  transition: { duration: 0.85, ease: EASE },
                 },
               }}
             >
-              <div className="relative h-52 overflow-hidden border-b border-white/10 bg-slate-950">
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-px rounded-2xl bg-[linear-gradient(135deg,transparent_30%,rgba(230,201,139,0.18)_50%,transparent_70%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100"
+              />
+              <div className="relative h-56 overflow-hidden border-b border-white/[0.06] bg-[#070708]">
                 <Image
                   src={project.image}
                   alt={project.imageAlt}
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
-                  className="object-cover transition duration-700 group-hover:scale-105"
+                  className="object-cover saturate-[0.85] transition-all duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06] group-hover:saturate-100"
                   unoptimized
                 />
-                <div className={`absolute inset-0 bg-gradient-to-br ${project.accent} opacity-25 mix-blend-screen`} />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,23,0.06),rgba(2,6,23,0.72)),radial-gradient(circle_at_18%_12%,rgba(34,211,238,0.26),transparent_34%),radial-gradient(circle_at_82%_8%,rgba(167,139,250,0.24),transparent_32%)]" />
-                <div className="absolute inset-x-6 bottom-6 top-6 rounded-lg border border-white/15 ring-1 ring-cyan-200/10" />
-                <div className="absolute bottom-8 left-8 right-8">
-                  <p className="text-sm text-white/75">
-                    {projects.projectLabel} 0{index + 1}
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_30%,rgba(5,5,5,0.85)_100%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_15%,rgba(230,201,139,0.14),transparent_45%)]" />
+                <div className="absolute bottom-7 left-7 right-7">
+                  <p className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-[#e6c98b]">
+                    {projects.projectLabel} · 0{index + 1}
                   </p>
-                  <h3 className="mt-2 text-2xl font-semibold text-white">{project.title}</h3>
+                  <h3 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                    {project.title}
+                  </h3>
+                </div>
+                <div className="absolute right-7 top-7 grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-md transition-all duration-500 group-hover:border-[#e6c98b]/50 group-hover:text-[#e6c98b]">
+                  <ArrowUpRight size={16} aria-hidden="true" />
                 </div>
               </div>
 
-              <div className="p-6">
-                <p className="text-sm leading-7 text-slate-300">{project.description}</p>
+              <div className="relative p-7">
+                <p className="text-sm leading-7 text-zinc-400">{project.description}</p>
                 <div className="mt-6 flex flex-wrap gap-2">
                   {project.tech.map((tech) => (
-                    <span key={tech} className="rounded-lg border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-medium text-slate-200">
+                    <span
+                      key={tech}
+                      className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-zinc-300"
+                    >
                       {tech}
                     </span>
                   ))}
                 </div>
-                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                <div className="mt-7 flex flex-col gap-2.5 sm:flex-row">
                   <motion.a
                     href={project.liveUrl ?? "#contact"}
                     target={project.liveUrl ? "_blank" : undefined}
                     rel={project.liveUrl ? "noreferrer" : undefined}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-cyan-100 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-[0_0_24px_rgba(34,211,238,0.18)] transition hover:bg-white"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="group/btn inline-flex items-center justify-center gap-2 rounded-full bg-zinc-50 px-5 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-white"
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 380, damping: 24 }}
                   >
-                    <ExternalLink size={16} aria-hidden="true" />
+                    <ExternalLink size={14} aria-hidden="true" />
                     {projects.preview}
                   </motion.a>
                   <motion.a
                     href="#contact"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/[0.08] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-cyan-200/45 hover:bg-white/[0.12]"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:border-[#e6c98b]/40 hover:text-white"
+                    whileHover={{ y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 380, damping: 24 }}
                   >
-                    <ArrowUpRight size={16} aria-hidden="true" />
                     {projects.details}
                   </motion.a>
                 </div>

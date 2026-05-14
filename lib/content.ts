@@ -23,11 +23,6 @@ const certificationFiles = {
     filename: "ielts-certificate.pdf",
     preview: "/certifications/ielts.png",
   },
-  laurea: {
-    href: "/certifications/laurea-triannale.pdf",
-    filename: "laurea-triannale.pdf",
-    preview: "/certifications/laurea-triannale.jpg",
-  },
   tcf: {
     href: "/certifications/tcf.pdf",
     filename: "tcf-certificate.pdf",
@@ -323,16 +318,6 @@ export const translations: Record<Locale, SiteContent> = {
       pdf: "PDF",
       items: [
         {
-          title: "Bachelor Degree Certificate",
-          issuer: "University credential",
-          description:
-            "Academic certification connected to my computer technologies and information systems development foundation.",
-          href: certificationFiles.laurea.href,
-          filename: certificationFiles.laurea.filename,
-          preview: certificationFiles.laurea.preview,
-          imageAlt: "Bachelor degree certificate preview",
-        },
-        {
           title: "AWS Certificate",
           issuer: "Amazon Web Services",
           description:
@@ -565,16 +550,6 @@ export const translations: Record<Locale, SiteContent> = {
       pending: "Disponibile Presto",
       pdf: "PDF",
       items: [
-        {
-          title: "Certificato Laurea Triennale",
-          issuer: "Credenziale universitaria",
-          description:
-            "Certificazione accademica collegata alla mia base in tecnologie informatiche e sviluppo sistemi informativi.",
-          href: certificationFiles.laurea.href,
-          filename: certificationFiles.laurea.filename,
-          preview: certificationFiles.laurea.preview,
-          imageAlt: "Anteprima del certificato di laurea triennale",
-        },
         {
           title: "Certificato AWS",
           issuer: "Amazon Web Services",

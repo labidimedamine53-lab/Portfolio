@@ -15,6 +15,8 @@ import {
 import { useLocale } from "./LocaleProvider";
 import SectionHeading from "./SectionHeading";
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 const iconMap: Record<string, LucideIcon> = {
   HTML: FileCode2,
   CSS: Palette,
@@ -37,7 +39,7 @@ export default function Skills() {
   const skills = content.skills;
 
   return (
-    <section id="skills" className="px-5 py-24 sm:px-8 lg:px-10">
+    <section id="skills" className="px-5 py-28 sm:px-8 lg:px-10">
       <div className="mx-auto max-w-7xl">
         <SectionHeading
           eyebrow={skills.eyebrow}
@@ -46,13 +48,13 @@ export default function Skills() {
         />
 
         <motion.div
-          className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-7"
+          className="mt-16 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-7"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-90px" }}
           variants={{
             hidden: {},
-            visible: { transition: { staggerChildren: 0.045 } },
+            visible: { transition: { staggerChildren: 0.05 } },
           }}
         >
           {skills.items.map((skill) => {
@@ -61,20 +63,29 @@ export default function Skills() {
             return (
               <motion.div
                 key={skill}
-                className="group min-h-32 rounded-lg border border-white/10 bg-white/[0.055] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.22)] backdrop-blur-xl transition hover:-translate-y-1 hover:border-cyan-200/40 hover:bg-white/[0.085] hover:shadow-[0_0_38px_rgba(34,211,238,0.16)]"
+                className="group relative min-h-32 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.025] p-5 backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5 hover:border-white/25 hover:bg-white/[0.06]"
                 variants={{
-                  hidden: { opacity: 0, y: 24 },
+                  hidden: { opacity: 0, y: 24, filter: "blur(4px)" },
                   visible: {
                     opacity: 1,
                     y: 0,
-                    transition: { duration: 0.48, ease: "easeOut" },
+                    filter: "blur(0px)",
+                    transition: { duration: 0.7, ease: EASE },
                   },
                 }}
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 320, damping: 22 }}
               >
-                <div className="grid h-11 w-11 place-items-center rounded-lg border border-cyan-200/20 bg-cyan-200/10 text-cyan-100 transition group-hover:border-cyan-100/45 group-hover:text-white">
-                  <Icon size={20} aria-hidden="true" />
+                <div
+                  aria-hidden="true"
+                  className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-[#e6c98b]/[0.08] opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100"
+                />
+                <div className="relative grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[0.04] text-zinc-300 transition-colors group-hover:border-[#e6c98b]/35 group-hover:bg-white/[0.06] group-hover:text-[#e6c98b]">
+                  <Icon size={18} aria-hidden="true" />
                 </div>
-                <p className="mt-5 text-sm font-semibold leading-6 text-white">{skill}</p>
+                <p className="relative mt-5 text-sm font-semibold tracking-tight text-white">
+                  {skill}
+                </p>
               </motion.div>
             );
           })}

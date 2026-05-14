@@ -12,6 +12,8 @@ import Projects from "@/components/Projects";
 import Skills from "@/components/Skills";
 import SpaceBackground from "@/components/SpaceBackground";
 
+export const runtime = "nodejs";
+
 export default function Home() {
   return (
     <>

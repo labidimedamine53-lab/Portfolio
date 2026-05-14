@@ -2,8 +2,29 @@ import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 
-const url = process.env.DATABASE_URL ?? "file:./local.db";
-const authToken = process.env.DATABASE_AUTH_TOKEN;
+function resolveDatabaseUrl() {
+  const configuredUrl = process.env.DATABASE_URL?.trim();
+  if (configuredUrl) return configuredUrl;
+
+  // Serverless production bundles usually cannot write next to the app code.
+  // Use the writable temp directory as a last-resort fallback so admin/contact
+  // still work online, then encourage a hosted libSQL/Turso DB for persistence.
+  if (process.env.NODE_ENV === "production" && process.platform !== "win32") {
+    return "file:/tmp/portfolio.db";
+  }
+
+  return "file:./local.db";
+}
+
+const configuredDatabaseUrl = process.env.DATABASE_URL?.trim();
+const url = resolveDatabaseUrl();
+const authToken = process.env.DATABASE_AUTH_TOKEN?.trim();
+
+export const databaseStatus = {
+  configured: Boolean(configuredDatabaseUrl),
+  temporary: !configuredDatabaseUrl && process.env.NODE_ENV === "production",
+  usingLocalFile: url.startsWith("file:"),
+};
 
 const client = createClient({
   url,

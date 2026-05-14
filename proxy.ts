@@ -7,6 +7,24 @@ export const config = {
 
 const encoder = new TextEncoder();
 
+type NetlifyGlobal = typeof globalThis & {
+  Netlify?: {
+    env?: {
+      get?: (key: string) => string | undefined;
+    };
+  };
+};
+
+function readEnv(key: string) {
+  const nodeValue =
+    typeof process === "undefined" ? undefined : process.env[key]?.trim();
+
+  return (
+    (globalThis as NetlifyGlobal).Netlify?.env?.get?.(key)?.trim() ||
+    nodeValue
+  );
+}
+
 // Constant-time string comparison (Edge runtime has no node:crypto)
 function timingSafeEqual(a: string, b: string): boolean {
   const aBytes = encoder.encode(a);
@@ -37,8 +55,8 @@ async function denyWithDelay(): Promise<NextResponse> {
 }
 
 export async function proxy(req: NextRequest) {
-  const expectedUser = process.env.ADMIN_USER;
-  const expectedPass = process.env.ADMIN_PASSWORD;
+  const expectedUser = readEnv("ADMIN_USER");
+  const expectedPass = readEnv("ADMIN_PASSWORD");
 
   if (!expectedUser || !expectedPass) {
     return new NextResponse("Admin disabled — set ADMIN_USER and ADMIN_PASSWORD.", {

@@ -50,21 +50,11 @@ export default function Contact() {
   const { content, locale } = useLocale();
   const contact = content.contact;
   const formRef = useRef<HTMLFormElement>(null);
-  const loadedAtRef = useRef<HTMLInputElement>(null);
   const [state, formAction] = useActionState(submitContact, initialState);
-
-  useEffect(() => {
-    if (loadedAtRef.current) {
-      loadedAtRef.current.value = String(Date.now());
-    }
-  }, []);
 
   useEffect(() => {
     if (state.ok) {
       formRef.current?.reset();
-      if (loadedAtRef.current) {
-        loadedAtRef.current.value = String(Date.now());
-      }
     }
   }, [state.ok, state.message]);
 
@@ -151,16 +141,6 @@ export default function Contact() {
             transition={{ duration: 0.95, ease: EASE }}
           >
             <input type="hidden" name="locale" value={locale} />
-            <input ref={loadedAtRef} type="hidden" name="loadedAt" />
-            {/* Honeypot — hidden from real users, attractive to bots */}
-            <input
-              type="text"
-              name="website"
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              className="absolute h-px w-px -translate-x-full opacity-0"
-            />
             <div className="absolute right-0 top-0 h-px w-28 bg-gradient-to-l from-[#e6c98b]/60 to-transparent" />
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-zinc-400">

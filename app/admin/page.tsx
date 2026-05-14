@@ -16,16 +16,30 @@ import {
   VerticalBarChart,
 } from "@/components/admin/Charts";
 import { loadDashboardData } from "@/lib/db/analytics";
+import { databaseStatus } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+export const runtime = "nodejs";
 
 export default async function AdminPage() {
-  const data = await loadDashboardData();
+  let data: Awaited<ReturnType<typeof loadDashboardData>>;
+  try {
+    data = await loadDashboardData();
+  } catch (err) {
+    console.error("[AdminPage] failed to load dashboard:", err);
+    return (
+      <main className="mx-auto max-w-7xl px-5 py-12 text-zinc-200 sm:px-8">
+        <Header />
+        <DatabaseErrorNotice />
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-7xl px-5 py-12 text-zinc-200 sm:px-8">
       <Header />
+      {databaseStatus.temporary ? <TemporaryDatabaseNotice /> : null}
 
       {/* Top metrics */}
       <section className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -107,6 +121,39 @@ export default async function AdminPage() {
         </Panel>
       </section>
     </main>
+  );
+}
+
+function DatabaseErrorNotice() {
+  return (
+    <section className="mt-6 rounded-2xl border border-red-300/25 bg-red-300/[0.07] px-5 py-4 text-sm leading-6 text-red-100">
+      <p className="font-semibold text-red-50">The admin database could not be opened.</p>
+      <p className="mt-1 text-red-100/80">
+        Check your deployed environment variables for
+        <span className="font-mono text-red-50"> DATABASE_URL </span>
+        and
+        <span className="font-mono text-red-50"> DATABASE_AUTH_TOKEN</span>.
+        Local
+        <span className="font-mono text-red-50"> .env.local </span>
+        values are not included automatically when the site is online.
+      </p>
+    </section>
+  );
+}
+
+function TemporaryDatabaseNotice() {
+  return (
+    <section className="mt-6 rounded-2xl border border-amber-300/25 bg-amber-300/[0.07] px-5 py-4 text-sm leading-6 text-amber-100">
+      <p className="font-semibold text-amber-50">Production database is not configured.</p>
+      <p className="mt-1 text-amber-100/80">
+        The online app is using temporary server storage. Contact messages can work,
+        but they may disappear after a redeploy or cold start. Set
+        <span className="font-mono text-amber-50"> DATABASE_URL </span>
+        and
+        <span className="font-mono text-amber-50"> DATABASE_AUTH_TOKEN </span>
+        in your host to make the inbox persistent.
+      </p>
+    </section>
   );
 }
 
@@ -317,4 +364,3 @@ function MessagesList({
     </ul>
   );
 }
-

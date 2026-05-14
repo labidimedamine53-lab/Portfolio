@@ -7,28 +7,61 @@ import { db, ensureDatabase, schema } from "@/lib/db";
 import { checkRateLimits } from "@/lib/rateLimit";
 
 const schemaShape = z.object({
-  name: z.string().trim().min(2, "Name is too short").max(120),
-  email: z.string().trim().email("Invalid email"),
-  message: z.string().trim().min(10, "Message is too short").max(4000),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Name must be at least 2 characters")
+    .max(120, "Name must be 120 characters or fewer"),
+  email: z.string().trim().email("Enter a valid email address"),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Message must be at least 10 characters")
+    .max(4000, "Message must be 4000 characters or fewer"),
   locale: z.string().trim().max(8).optional(),
-  // honeypot — bots fill hidden fields, humans do not
-  website: z.string().max(0, "Spam detected").optional().or(z.literal("")),
-  // milliseconds since the form was rendered — submissions faster than 1.5s are bot-like
-  loadedAt: z.coerce.number().int().nonnegative().optional(),
 });
 
-const MIN_FILL_MS = 1500;
+const fieldLabels = {
+  name: "Name",
+  email: "Email",
+  message: "Message",
+} as const;
+
+type VisibleField = keyof typeof fieldLabels;
 
 export type ContactState = {
   ok: boolean;
   message: string;
-  errors?: Partial<Record<"name" | "email" | "message", string>>;
+  errors?: Partial<Record<VisibleField, string>>;
 };
 
 function hashIp(ip: string | null) {
   if (!ip) return "anon";
   const salt = process.env.IP_HASH_SALT ?? "portfolio-default-salt";
   return crypto.createHash("sha256").update(`${salt}:${ip}`).digest("hex").slice(0, 32);
+}
+
+function getValidationErrors(
+  fieldErrors: Partial<Record<string, string[] | undefined>>,
+) {
+  const errors: Partial<Record<VisibleField, string>> = {};
+
+  for (const field of Object.keys(fieldLabels) as VisibleField[]) {
+    const error = fieldErrors[field]?.[0];
+    if (error) errors[field] = error;
+  }
+
+  return errors;
+}
+
+function formatValidationMessage(errors: Partial<Record<VisibleField, string>>) {
+  const details = (Object.keys(fieldLabels) as VisibleField[])
+    .filter((field) => errors[field])
+    .map((field) => `${fieldLabels[field]}: ${errors[field]}`);
+
+  return details.length > 0
+    ? `Please fix ${details.join("; ")}.`
+    : "Please check the form and try again.";
 }
 
 export async function submitContact(
@@ -40,31 +73,16 @@ export async function submitContact(
     email: formData.get("email"),
     message: formData.get("message"),
     locale: formData.get("locale") ?? undefined,
-    website: formData.get("website") ?? "",
-    loadedAt: formData.get("loadedAt") ?? undefined,
   });
 
   if (!parsed.success) {
-    const flat = parsed.error.flatten().fieldErrors;
+    const errors = getValidationErrors(parsed.error.flatten().fieldErrors);
+
     return {
       ok: false,
-      message: "Please fix the highlighted fields.",
-      errors: {
-        name: flat.name?.[0],
-        email: flat.email?.[0],
-        message: flat.message?.[0],
-      },
+      message: formatValidationMessage(errors),
+      errors,
     };
-  }
-
-  // Honeypot — return fake success so bots don't know they were caught
-  if (parsed.data.website && parsed.data.website.length > 0) {
-    return { ok: true, message: "Thanks! I'll be in touch soon." };
-  }
-
-  // Time-to-fill check — bots auto-submit faster than humans can type
-  if (parsed.data.loadedAt && Date.now() - parsed.data.loadedAt < MIN_FILL_MS) {
-    return { ok: true, message: "Thanks! I'll be in touch soon." };
   }
 
   const h = await headers();
@@ -81,11 +99,10 @@ export async function submitContact(
     console.error("[submitContact] DB setup failed:", err);
     return {
       ok: false,
-      message: "Something went wrong. Please email me directly.",
+      message: "Your message could not be saved because the database is unavailable.",
     };
   }
 
-  // Rate limit: 3 per hour, 10 per day, per IP
   const limit = await checkRateLimits(`contact:${ipHash}`, [
     { limit: 3, windowSec: 3600, suffix: "h" },
     { limit: 10, windowSec: 86_400, suffix: "d" },
@@ -113,7 +130,7 @@ export async function submitContact(
     console.error("[submitContact] DB insert failed:", err);
     return {
       ok: false,
-      message: "Something went wrong. Please email me directly.",
+      message: "Your message could not be saved. Please email me directly.",
     };
   }
 }
